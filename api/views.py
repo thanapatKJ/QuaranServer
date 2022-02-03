@@ -1,7 +1,7 @@
 # from api.forms import UserForm
 from database.models import User, FaceData, Quarantine
 from django.http import HttpResponse, JsonResponse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -57,6 +57,8 @@ class Check(APIView):
 
 class Profile(APIView):
     permission_classes = [IsAuthenticated]
+
+    # Profile screen data
     def get(self,request,format=None):
         user = User.objects.filter(username=request.user.username).first()
         object = {
@@ -68,6 +70,8 @@ class Profile(APIView):
         }
         return Response(object)
 
+
+    # Change Password
     def post(self,request,format=None):
         try:
             print('Password Change')
@@ -90,37 +94,71 @@ class Profile(APIView):
                 }
             return Response(object)
 
-class Quarantine(APIView):
+class Quarantine_class(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     # GET ใช้ในการยืนยันในหน้า Home และหน้า QuarantinePlace เพื่อยืนยันว่ามีการ Quarantine อยู่หรือไม่
     def get(self,request,format=None):
-        
-        # object = {
-        #     'status':'quarantine',
-        #     'lat':'lat',
-        #     'long':'long',
-        #     'radius':'radius',
-        #     'name':'placeName',
-        #     'detail':'detail'
-        #     }
-        object = {
-            'status':'none',
-        }
+        print('quarantine get')
+        # try:
+        user = User.objects.filter(username=request.user.username).first()
+        quarantine_data = Quarantine.objects.filter().first()
+        # print('try')
+        print(quarantine_data)
+        if quarantine_data is None:
+            object = {
+                'status':False,
+                }
+        else:
+            print('None')
+            # quarantine_data.start_datetime.date 
+            object = {
+                'status':True,
+                'name':quarantine_data.name,
+                'lat':quarantine_data.lat,
+                'long':quarantine_data.long,
+                'radius':quarantine_data.radius,
+                'address':quarantine_data.address,
+                'start_datetime':str(quarantine_data.start_date),
+                'end_datetime':str(quarantine_data.start_date + timedelta(days=30)),
+            }
+            print()
+        # }
         return Response(object)
 
+    # DELETE ใช้ในการลบข้อมูลการเข้า quarantine
+    def delete(self,request,format=None):
+        user = User.objects.filter(username=request.user.username).first()
+        quarantine_data = Quarantine.objects.filter().first().delete()
+        object = {'status':'success'}
+        return Response(object)
 
     # POST ใช้ในการรับค่าจาก Client ในหน้า QuarantinePlace ในการสร้างสถานที่ Quarantine
     def post(self,request,format=None):
+        print('post quarantine')
         try:
             data = json.loads(request.body)
+            print(data)
             user = User.objects.filter(username=request.user.username).first()
-            
+            quarantine_data = Quarantine.objects.filter().first()
+            if quarantine_data is not None:
+                Quarantine.objects.create(
+                    user=user,
+                    name=data['name'],
+                    lat=data['lat'],
+                    long=data['long'],
+                    radius=data['radius'],
+                    address=data['address'])
+            else:
+                raise Exception('Already has quarantine data')
+            print('try')
         except:
-            pass
+            print('except')
         else:
+            print('else')
             object = {
                 'method':'quarantine',
                 'status':'success'
                 }
             return Response(object)
+
