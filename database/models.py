@@ -20,7 +20,8 @@ class Quarantine(models.Model):
     radius = models.FloatField(null=False,blank=False, default=50)
     address = models.TextField()
     STATUS_CHOICES = (
-        ("active","active"),
+        ("verified","verified"),
+        ("unverified","unverified"),
         ("inactive","inactive"),
         # ("passive")
     )

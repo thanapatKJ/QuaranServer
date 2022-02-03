@@ -5,6 +5,9 @@ from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework.authtoken.views import obtain_auth_token
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from .updater import start
+
 app_name='api'
 urlpatterns = [
     path('register/',views.register.as_view()),
@@ -15,3 +18,8 @@ urlpatterns = [
     path('check/',views.Check.as_view(), name="check"),
     # path('setPassword/',views.setPassword.as_view(), name="setPassword")
 ]
+
+# scheduler = BackgroundScheduler()
+# scheduler.add_job(update_something, 'interval', seconds=5)
+# scheduler.start()
+start()

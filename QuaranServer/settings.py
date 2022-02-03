@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    
+    # "django_apscheduler",
+
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# APSCHEDULER_DATETIME_FORMAT = '%Y-%m-%d %H:%M'
+# APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 
