@@ -25,7 +25,7 @@ class Quarantine(models.Model):
         ("inactive","inactive"),
         # ("passive")
     )
-    quarantine_status = models.CharField(null=False,blank=False,max_length=10, choices=STATUS_CHOICES,default="active")
+    quarantine_status = models.CharField(null=False,blank=False,max_length=10, choices=STATUS_CHOICES,default="verified")
 
     start_date = models.DateTimeField(null=False,blank=False)
     last_checked = models.DateTimeField(null=True,blank=True)
@@ -39,6 +39,6 @@ class Quarantine(models.Model):
 class History(models.Model):
     quarantine = models.ForeignKey(Quarantine,on_delete=models.CASCADE)
     check_datetime = models.DateTimeField(null=True,blank=True)
-
-
+    lat_check = models.FloatField(null=False,blank=False)
+    long_check = models.FloatField(null=False,blank=False)
 # class QuarantineHistory(models.)

@@ -1,5 +1,5 @@
 # from api.forms import UserForm
-from database.models import User, FaceData, Quarantine
+from database.models import History, User, FaceData, Quarantine
 from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta
 
@@ -102,7 +102,7 @@ class Quarantine_class(APIView):
         print('quarantine get')
         # try:
         user = User.objects.filter(username=request.user.username).first()
-        quarantine_data = Quarantine.objects.filter().first()
+        quarantine_data = Quarantine.objects.filter(user=user).first()
         # print('try')
         print(quarantine_data)
         if quarantine_data is None:
@@ -111,7 +111,6 @@ class Quarantine_class(APIView):
                 }
         else:
             print('None')
-            # quarantine_data.start_datetime.date 
             object = {
                 'status':True,
                 'name':quarantine_data.name,
@@ -122,14 +121,12 @@ class Quarantine_class(APIView):
                 'start_datetime':str(quarantine_data.start_date),
                 'end_datetime':str(quarantine_data.start_date + timedelta(days=30)),
             }
-            print()
-        # }
         return Response(object)
 
     # DELETE ใช้ในการลบข้อมูลการเข้า quarantine
     def delete(self,request,format=None):
         user = User.objects.filter(username=request.user.username).first()
-        quarantine_data = Quarantine.objects.filter().first().delete()
+        quarantine_data = Quarantine.objects.filter(user=user).first().delete()
         object = {'status':'success'}
         return Response(object)
 
@@ -138,17 +135,17 @@ class Quarantine_class(APIView):
         print('post quarantine')
         try:
             data = json.loads(request.body)
-            print(data)
             user = User.objects.filter(username=request.user.username).first()
-            quarantine_data = Quarantine.objects.filter().first()
-            if quarantine_data is not None:
+            quarantine_data = Quarantine.objects.filter(user=user).first()
+            if quarantine_data is None:
                 Quarantine.objects.create(
                     user=user,
                     name=data['name'],
                     lat=data['lat'],
                     long=data['long'],
                     radius=data['radius'],
-                    address=data['address'])
+                    address=data['address'],
+                    start_date=datetime.now())
             else:
                 raise Exception('Already has quarantine data')
             print('try')
@@ -162,3 +159,60 @@ class Quarantine_class(APIView):
                 }
             return Response(object)
 
+class Verify(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,format=None):
+        print('Verify get')
+        user = User.objects.filter(username=request.user.username).first()
+        quarantine_data = Quarantine.objects.filter(user=user).first()
+        next = ''
+        if quarantine_data is not None:
+            print('not none')
+            print(quarantine_data.quarantine_status)
+            if quarantine_data.quarantine_status == 'verified':
+                print('ver')
+                now = datetime.now()
+                status='verified'
+                if (now+timedelta(hours=3)).time() >= datetime.strptime("21:00","%H:%M").time():
+                    next = '21:00'
+                    print('return next time = 21:00')
+                elif (now+timedelta(hours=3)).time() >= datetime.strptime("18:00","%H:%M").time():
+                    next = '18:00'
+                    print('return next time = 18:00')
+                elif (now+timedelta(hours=3)).time() >= datetime.strptime("15:00","%H:%M").time():
+                    next = '15:00'
+                    print('return next time = 15:00')
+                elif (now+timedelta(hours=3)).time() >= datetime.strptime("12:00","%H:%M").time():
+                    next = '12:00'
+                    print('return next time = 12:00')
+                else:
+                    next = '9:00'
+                    print('return next time = 9:00')
+            elif quarantine_data.quarantine_status == 'unverified':
+                print('unverified')
+                status='unverified'
+            elif quarantine_data.quarantine_status == 'inactive':
+                print('inactive')
+                status='inactive'
+        else:
+            status='None'
+        object = {
+            'status':status,
+            'next_time':next}
+        return Response(object)
+
+    def post(self,request,format=None):
+        print('Verify POST')
+        user = User.objects.filter(username=request.user.username).first()
+        data = json.loads(request.body)
+        quarantine_data = Quarantine.objects.filter(user=user).first()
+        History.objects.create(
+            quarantine=quarantine_data,
+            check_datetime=datetime.now(),
+            lat_check=data['lat'],
+            long_check=data['long']
+            )
+        quarantine_data.quarantine_status = "verified"
+        quarantine_data.save()
+        object = {'status':'success'}
+        return Response(object)

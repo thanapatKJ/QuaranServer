@@ -22,7 +22,7 @@ def start():
     scheduler.add_job(send_email_inactive, 'cron', hour=18,minute=30)
     scheduler.add_job(send_email_inactive, 'cron', hour=21,minute=30)
 
+    # scheduler.add_job(end_quarantine, 'cron', hour=15,minute=47)
     scheduler.add_job(end_quarantine, 'cron', hour=0,minute=0)
-
 
     scheduler.start()
