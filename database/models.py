@@ -26,7 +26,7 @@ class Quarantine(models.Model):
         # ("passive")
     )
     quarantine_status = models.CharField(null=False,blank=False,max_length=10, choices=STATUS_CHOICES,default="verified")
-
+    is_inside = models.BooleanField(null=False,default=True)
     start_date = models.DateTimeField(null=False,blank=False)
     last_checked = models.DateTimeField(null=True,blank=True)
     

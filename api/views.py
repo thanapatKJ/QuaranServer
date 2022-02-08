@@ -10,10 +10,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny,IsAuthenticated
 
 import json
+import threading
+import time
 
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
-# from QuaranServer.settings import EMAIL_HOST_USER
+from QuaranServer.settings import EMAIL_HOST_USER
 
 class register(APIView):
     permission_classes = [AllowAny]
@@ -94,6 +96,56 @@ class Profile(APIView):
                 }
             return Response(object)
 
+
+def exit(quarantine_data,second):
+    print('exit '+str(quarantine_data.is_inside))
+    quarantine_data.is_inside = False
+    quarantine_data.save()
+    quarantine_data.save()
+    message = "You are outside of your quarantine place."
+    subject = 'Please go inside your quarantine place within 30 minutes.'
+    send_mail(subject,message,EMAIL_HOST_USER,[quarantine_data.user.email],fail_silently=False)
+    time.sleep(second)
+    if(not(quarantine_data.is_inside)):
+        
+        quarantine_data.quarantine_status = 'inactive'
+        quarantine_data.save()
+        message = "Your quarantine status is inactivated.\nPlease contact the QuaranClean's administrator to activate your status."+"\nTime: "+str(datetime.now().hour)+":"+str(datetime.now().minute)
+        subject = 'Your quarantine status is inactivated.'
+        send_mail(subject,message,EMAIL_HOST_USER,[quarantine_data.user.email],fail_silently=False)
+        print('inactive')
+
+    print('Exit already passed '+str(second))
+
+def enter(quarantine_data,second):
+    quarantine_data.is_inside = True
+    quarantine_data.save()
+    print('Enter already passed '+str(second))
+
+class EnterExit(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,format=None):
+        data = json.loads(request.body)
+        user = User.objects.filter(username=request.user.username).first()
+        quarantine_data = Quarantine.objects.filter(user=user).first()
+        action=''
+        print(data['action'])
+        if(data['action']=="enter"):
+            thr = threading.Thread(target=enter, args=[quarantine_data, 10])
+            action='enter'
+        elif(data['action']=="exit"):
+            thr = threading.Thread(target=exit, args=[quarantine_data, 1800])
+            action='exit'
+
+        thr.start()
+        print('return')
+        object={
+            'status':'success',
+            'action': action
+        }
+        return Response(object)
+
+
 class Quarantine_class(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -120,6 +172,7 @@ class Quarantine_class(APIView):
                 'address':quarantine_data.address,
                 'start_datetime':str(quarantine_data.start_date),
                 'end_datetime':str(quarantine_data.start_date + timedelta(days=30)),
+                'inside':quarantine_data.is_inside
             }
         return Response(object)
 

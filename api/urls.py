@@ -17,6 +17,8 @@ urlpatterns = [
     path('quarantine/',views.Quarantine_class.as_view(), name="quarantine"),
     path('check/',views.Check.as_view(), name="check"),
     path('verify/',views.Verify.as_view(), name="verify"),
+    path('enterexit/',views.EnterExit.as_view(), name="enterexit"),
+
     # path('setPassword/',views.setPassword.as_view(), name="setPassword")
 ]
 

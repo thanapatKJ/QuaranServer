@@ -14,8 +14,6 @@ pip install apscheduler
 
 
 Description
-    - Verify screen
-
+    - การแจ้งเตือนเมื่อมีการออกนอกสถานที่
     - เหลือดังนี้
         - ทำการเก็บไฟล์ Vector สำหรับทำ Face Recognition
-        - การแจ้งเตือนเมื่อมีการออกนอกสถานที่
