@@ -10,8 +10,8 @@ pip install django-filter  # Filtering support
 pip install django-cors-headers 
 <!-- pip install django-apscheduler -->
 pip install apscheduler
-
-
+pip install django-smtp-ssl
+pip install django-cleanup
 
 Description
     - การแจ้งเตือนเมื่อมีการออกนอกสถานที่

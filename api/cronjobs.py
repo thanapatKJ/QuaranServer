@@ -50,7 +50,7 @@ def end_quarantine():
     # print(datetime.now())
     for each in quarantine_data:
         start = each.start_date.strftime('%d-%m-%Y')
-        end = datetime.strptime(start, '%d-%m-%Y') + timedelta(days=15)
+        end = datetime.strptime(start, '%d-%m-%Y') + timedelta(days=14)
         start = datetime.strptime(start, '%d-%m-%Y')
         # print(start - timedelta(days=15))
         if datetime.now() >= end :

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'django_cleanup.apps.CleanupConfig',
+
     # "django_apscheduler",
 
 ]
@@ -117,6 +120,7 @@ DATABASES = {
 # ]
 
 AUTH_USER_MODEL = 'database.User'
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -137,17 +141,17 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+MEDIA_URL = '/api/user_images/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'database/user_images')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# APSCHEDULER_DATETIME_FORMAT = '%Y-%m-%d %H:%M'
-# APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
-
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+
 
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

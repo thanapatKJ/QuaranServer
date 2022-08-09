@@ -19,26 +19,26 @@ from QuaranServer.settings import EMAIL_HOST_USER
 
 class register(APIView):
     permission_classes = [AllowAny]
-    
     def post(self,request):
         print("status IN")
-        try:
-            data = json.loads(request.body)
-            user = User.objects.create_user(
-                username=data['id_cards'],
-                first_name=data['first_name'],
-                last_name=data['last_name'],
-                email=data['email'],
-                password=data['password'],
-                id_cards=data['id_cards'],
-                numbers=data['numbers'],
+        print(request.POST['id_cards'])
+        user = User.objects.create_user(
+            username=request.POST['id_cards'],
+            first_name=request.POST['first_name'],
+            last_name=request.POST['last_name'],
+            email=request.POST['email'],
+            password=request.POST['password'],
+            id_cards=request.POST['id_cards'],
+            numbers=request.POST['numbers'],
             )
-            token = Token.objects.create(user=user)
-        except:
-            pass
-        else:
-            response = {'status':'success'}
-            return Response(response)
+        Token.objects.create(user=user)
+        # print(request.FILES['images'])
+        FaceData.objects.create(
+            user=user,
+            image=request.FILES['image']
+        )
+        response = {'status':'success'}
+        return Response(response)
 
 class logout(APIView):
     permission_classes = [IsAuthenticated]
@@ -71,7 +71,6 @@ class Profile(APIView):
             'email':user.email
         }
         return Response(object)
-
 
     # Change Password
     def post(self,request,format=None):
@@ -114,7 +113,6 @@ def exit(quarantine_data,second):
         subject = 'Your quarantine status is inactivated.'
         send_mail(subject,message,EMAIL_HOST_USER,[quarantine_data.user.email],fail_silently=False)
         print('inactive')
-
     print('Exit already passed '+str(second))
 
 def enter(quarantine_data,second):
@@ -135,6 +133,8 @@ class EnterExit(APIView):
             action='enter'
         elif(data['action']=="exit"):
             thr = threading.Thread(target=exit, args=[quarantine_data, 1800])
+            # thr = threading.Thread(target=exit, args=[quarantine_data, 10])
+
             action='exit'
 
         thr.start()
@@ -170,8 +170,8 @@ class Quarantine_class(APIView):
                 'long':quarantine_data.long,
                 'radius':quarantine_data.radius,
                 'address':quarantine_data.address,
-                'start_datetime':str(quarantine_data.start_date),
-                'end_datetime':str(quarantine_data.start_date + timedelta(days=30)),
+                'start_datetime':str((quarantine_data.start_date).strftime("%d/%m/%Y %H:%M")),
+                'end_datetime':str((quarantine_data.start_date + timedelta(days=14)).strftime("%d/%m/%Y %H:%M")),
                 'inside':quarantine_data.is_inside
             }
         return Response(object)

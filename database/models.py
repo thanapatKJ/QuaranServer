@@ -10,7 +10,12 @@ class User(AbstractUser):
 
 class FaceData(models.Model):
     user = OneToOneField(User,on_delete=models.CASCADE)
-    data = models.TextField()
+    image = models.ImageField(null=True)
+
+    class Meta:
+        ordering = ['user']
+    def __str__(self):
+        return str(self.user.id_cards)
 
 class Quarantine(models.Model):
     user = OneToOneField(User,on_delete=models.CASCADE)
