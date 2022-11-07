@@ -183,7 +183,7 @@ class Quarantine_class(APIView):
         object = {'status':'success'}
         return Response(object)
 
-    # POST ใช้ในการรับค่าจาก Client ในหน้า QuarantinePlace ในการสร้างสถานที่ Quarantine
+    # POST ใช้ในการรับค่าจาก Client ในหน้า QuarantinePlace ในการสร้างสถานที่ Quarantine radius + 15
     def post(self,request,format=None):
         print('post quarantine')
         try:
@@ -196,7 +196,7 @@ class Quarantine_class(APIView):
                     name=data['name'],
                     lat=data['lat'],
                     long=data['long'],
-                    radius=data['radius'],
+                    radius=int(data['radius'])+15,
                     address=data['address'],
                     start_date=datetime.now())
             else:
