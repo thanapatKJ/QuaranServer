@@ -101,7 +101,7 @@ def exit(quarantine_data,second):
     quarantine_data.is_inside = False
     quarantine_data.save()
     quarantine_data.save()
-    message = "You are outside of your quarantine place."
+    message = "You are outside of your quarantine place. " +str(datetime.now().hour)+":"+str(datetime.now().minute)
     subject = 'Please go inside your quarantine place within 30 minutes.'
     send_mail(subject,message,EMAIL_HOST_USER,[quarantine_data.user.email],fail_silently=False)
     time.sleep(second)

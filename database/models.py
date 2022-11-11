@@ -46,4 +46,9 @@ class History(models.Model):
     check_datetime = models.DateTimeField(null=True,blank=True)
     lat_check = models.FloatField(null=False,blank=False)
     long_check = models.FloatField(null=False,blank=False)
+
+    class Meta:
+        ordering = ['quarantine__user']
+    def __str__(self):
+        return str(self.quarantine.user.id_cards)+" : "+str(self.quarantine.name)+" : "+str(self.check_datetime)
 # class QuarantineHistory(models.)
